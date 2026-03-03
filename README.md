@@ -182,6 +182,10 @@ The immediate fix was upgrading the pipeline to NuGet `6.*`. This tool exists so
 
 ---
 
+## Author
+
+**Kieran Cremin**
+
 ## Contributing
 
 Issues and pull requests are welcome. If you encounter a false positive or a pattern this tool misses, please open an issue with an anonymised sample of the relevant `.csproj` fragment.
