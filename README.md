@@ -8,6 +8,10 @@
 
 ---
 
+<img width="1860" height="218" alt="image" src="https://github.com/user-attachments/assets/97668cb8-ece7-4a4c-a04e-000b6206d32e" />
+
+---
+
 ## 🎯 Why This Exists
 
 Large .NET solutions accumulate cruft over years of Visual Studio upgrades, NuGet migrations, and copy-paste errors. Duplicate references, stale build targets, and version mismatches hide quietly in project files until the day they cause a mysterious restore crash on a build agent with no useful error message.
