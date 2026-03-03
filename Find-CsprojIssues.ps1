@@ -1,4 +1,5 @@
 #Requires -Version 5.1
+# Author: Kieran Cremin
 <#
 .SYNOPSIS
     Scans .csproj files for NuGet and MSBuild issues that cause restore or build failures.
