@@ -98,7 +98,7 @@ Scanning 12 project(s)...
   DPS.Repository.csproj             0         1       0
   DPS.Model.csproj                  0         0       0
 
-  Issues: 3   Warnings: 1   Fixed: 0
+  Project issues: 3   Version conflicts: 1   Warnings: 1   Fixed: 0
 ```
 
 ---
@@ -151,8 +151,10 @@ Running with `-Fix` is safe. Before modifying any file:
 - `EnsureNuGetPackageBuildImports` → target body emptied, element kept
 
 **What is reported but NOT auto-fixed:**
-- Version conflicts → correct resolution depends on intent
-- Locale satellite bloat → may be intentional for localised applications
+
+- **Version conflicts** → requires a manual decision. The correct version to standardise on depends on intent — one project may need a newer version for a specific feature, another may be deliberately pinned to avoid a breaking change. Blindly picking a version could introduce subtle runtime bugs or regressions. Review each conflict in the output and update versions manually once you know which to keep.
+
+- **Locale satellite bloat** → may be intentional for localised applications that display non-English output.
 
 ---
 

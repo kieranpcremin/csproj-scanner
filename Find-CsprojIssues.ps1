@@ -319,6 +319,12 @@ if ($versionConflicts.Count -gt 0) {
         }
     }
     Write-Host ""
+    Write-Host "  NOTE: Version conflicts are not auto-fixed by -Fix." -ForegroundColor DarkYellow
+    Write-Host "  Reason: the correct version to standardise on depends on intent - one project" -ForegroundColor DarkYellow
+    Write-Host "  may need a newer version for a specific feature, another may be pinned to avoid" -ForegroundColor DarkYellow
+    Write-Host "  a breaking change. Getting this wrong can cause subtle runtime bugs. Review each" -ForegroundColor DarkYellow
+    Write-Host "  conflict above and update the versions manually once you know which to keep." -ForegroundColor DarkYellow
+    Write-Host ""
 }
 
 # ── Summary table ─────────────────────────────────────────────────────────────
