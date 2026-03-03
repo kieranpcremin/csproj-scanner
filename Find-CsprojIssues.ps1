@@ -319,7 +319,6 @@ if ($versionConflicts.Count -gt 0) {
         }
     }
     Write-Host ""
-    $totalIssues += $versionConflicts.Count
 }
 
 # ── Summary table ─────────────────────────────────────────────────────────────
@@ -340,8 +339,8 @@ foreach ($r in ($allResults | Sort-Object { $_.Issues.Count * 100 + $_.Warnings.
 }
 
 Write-Host ""
-$totColor = if ($totalIssues -gt 0) { "Red" } else { "Green" }
-Write-Host "  Issues: $totalIssues   Warnings: $totalWarnings   Fixed: $totalFixed" -ForegroundColor $totColor
+$totColor = if ($totalIssues -gt 0 -or $versionConflicts.Count -gt 0) { "Red" } else { "Green" }
+Write-Host "  Project issues: $totalIssues   Version conflicts: $($versionConflicts.Count)   Warnings: $totalWarnings   Fixed: $totalFixed" -ForegroundColor $totColor
 Write-Host ""
 
 # ── File output ───────────────────────────────────────────────────────────────
