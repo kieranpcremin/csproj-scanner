@@ -24,7 +24,11 @@
 
 .PARAMETER Fix
     Automatically fix safe issues: duplicates and active EnsureNuGetPackageBuildImports.
-    A .bak backup of each modified file is created before any changes are written.
+    A .bak backup of each modified file is created before any changes are written unless -NoBackup is specified.
+
+.PARAMETER NoBackup
+    Skip creating .bak backup files when running with -Fix.
+    Use with caution — changes cannot be undone automatically.
 
 .PARAMETER OutputFile
     Write the full report to a file. Supports .txt and .html extensions.
@@ -36,12 +40,14 @@
     .\Find-CsprojIssues.ps1
     .\Find-CsprojIssues.ps1 -Path "C:\Work\MySolution.sln"
     .\Find-CsprojIssues.ps1 -Path "C:\Work\Src" -Fix
+    .\Find-CsprojIssues.ps1 -Path "C:\Work\Src" -Fix -NoBackup
     .\Find-CsprojIssues.ps1 -Path "C:\Work\Src" -OutputFile "report.html"
     .\Find-CsprojIssues.ps1 -Path "C:\Work\Src" -Fix -OutputFile "report.txt" -ShowClean
 #>
 param(
     [string]$Path       = ".",
     [switch]$Fix,
+    [switch]$NoBackup,
     [string]$OutputFile = "",
     [switch]$ShowClean
 )
@@ -79,8 +85,8 @@ function Get-PackageRefVersion ([System.Xml.XmlNode]$Node) {
     return $v
 }
 
-function Save-FixedXml ([string]$FilePath, [System.Xml.XmlDocument]$Xml) {
-    Copy-Item $FilePath "$FilePath.bak" -Force
+function Save-FixedXml ([string]$FilePath, [System.Xml.XmlDocument]$Xml, [bool]$Backup) {
+    if ($Backup) { Copy-Item $FilePath "$FilePath.bak" -Force }
     $settings             = New-Object System.Xml.XmlWriterSettings
     $settings.Indent      = $true
     $settings.IndentChars = "  "
@@ -98,7 +104,7 @@ function ConvertTo-HtmlSafe ([string]$Text) {
 # Per-project scan
 # =============================================================================
 
-function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix) {
+function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$Backup) {
 
     $result = [PSCustomObject]@{
         FileName = $File.Name
@@ -231,7 +237,7 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix) {
 
     # ── Save if fixes were applied ────────────────────────────────────────────
     if ($ApplyFix -and $modified) {
-        Save-FixedXml -FilePath $File.FullName -Xml $xml
+        Save-FixedXml -FilePath $File.FullName -Xml $xml -Backup $Backup
         $result.WasFixed = $true
     }
 
@@ -252,7 +258,11 @@ $resolvedPath = Resolve-Path $Path -ErrorAction SilentlyContinue
 if (-not $resolvedPath) { Write-Error "Path not found: $Path"; exit 1 }
 
 if ($Fix) {
-    Write-Host "[FIX MODE]  Safe issues will be fixed automatically. .bak backups will be created." -ForegroundColor Yellow
+    if ($NoBackup) {
+        Write-Host "[FIX MODE]  Safe issues will be fixed automatically. Backups are DISABLED (-NoBackup)." -ForegroundColor Yellow
+    } else {
+        Write-Host "[FIX MODE]  Safe issues will be fixed automatically. .bak backups will be created." -ForegroundColor Yellow
+    }
     Write-Host ""
 }
 
@@ -269,7 +279,7 @@ $allResults  = [System.Collections.Generic.List[object]]::new()
 $allVersions = @{}   # lowerPackageName -> { versionString -> [fileNames] }
 
 foreach ($file in $csprojFiles) {
-    $result = Invoke-ScanProject -File $file -ApplyFix $Fix.IsPresent
+    $result = Invoke-ScanProject -File $file -ApplyFix $Fix.IsPresent -Backup (-not $NoBackup.IsPresent)
     $allResults.Add($result)
 
     foreach ($kvp in $result.Packages.GetEnumerator()) {

@@ -113,6 +113,7 @@ Scanning 12 project(s)...
 |---|---|---|---|
 | `-Path` | String | `.` (current directory) | Directory or `.sln` file to scan |
 | `-Fix` | Switch | Off | Auto-fix safe issues with automatic `.bak` backups |
+| `-NoBackup` | Switch | Off | Skip `.bak` backup creation when running with `-Fix` |
 | `-OutputFile` | String | None | Write report to a `.txt` or `.html` file |
 | `-ShowClean` | Switch | Off | Include projects with no issues in the output |
 
@@ -121,6 +122,9 @@ Scanning 12 project(s)...
 ```powershell
 # Auto-fix all safe issues (creates .bak backups before modifying)
 .\Find-CsprojIssues.ps1 -Path "C:\Work\Src" -Fix
+
+# Auto-fix without creating .bak backups
+.\Find-CsprojIssues.ps1 -Path "C:\Work\Src" -Fix -NoBackup
 
 # Export a styled HTML report
 .\Find-CsprojIssues.ps1 -Path "C:\Work\Src" -OutputFile "report.html"
@@ -142,6 +146,8 @@ Scanning 12 project(s)...
 Running with `-Fix` is safe. Before modifying any file:
 - ✅ A `.bak` copy is created next to the original (e.g. `DPS.BL.csproj.bak`)
 - ✅ Only clearly safe issues are auto-fixed
+
+Add `-NoBackup` to skip backup creation if you are confident in the changes or working in a version-controlled directory where files can be reverted via git.
 
 **What gets fixed automatically:**
 - Duplicate `PackageReference` elements → second and subsequent occurrences removed
