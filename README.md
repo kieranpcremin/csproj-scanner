@@ -155,12 +155,11 @@ Add `-NoBackup` to skip backup creation if you are confident in the changes or w
 - Duplicate `Import` elements → second and subsequent occurrences removed
 - Duplicate assembly `Reference` elements → second and subsequent occurrences removed
 - `EnsureNuGetPackageBuildImports` → target body emptied, element kept
+- Locale satellite packages → all locale variants removed, base package preserved (e.g. `Humanizer.Core.fr` removed, `Humanizer.Core` kept)
 
 **What is reported but NOT auto-fixed:**
 
 - **Version conflicts** → requires a manual decision. The correct version to standardise on depends on intent — one project may need a newer version for a specific feature, another may be deliberately pinned to avoid a breaking change. Blindly picking a version could introduce subtle runtime bugs or regressions. Review each conflict in the output and update versions manually once you know which to keep.
-
-- **Locale satellite bloat** → may be intentional for localised applications that display non-English output.
 
 ---
 

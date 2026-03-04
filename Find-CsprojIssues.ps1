@@ -226,6 +226,16 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
     if ($localeSatellites) {
         foreach ($group in ($localeSatellites | Group-Object Base | Where-Object { $_.Count -ge 3 })) {
             $result.Warnings.Add("[LOCALE BLOAT]  $($group.Count) locale satellite packs for '$($group.Name)' - remove unless non-English output is required")
+            if ($ApplyFix) {
+                $packagesToRemove = $group.Group.Package
+                foreach ($node in $pkgNodes) {
+                    if ($packagesToRemove -contains $node.GetAttribute("Include")) {
+                        $node.ParentNode.RemoveChild($node) | Out-Null
+                        $modified = $true
+                    }
+                }
+                $result.Fixed.Add("Removed $($group.Count) locale satellite packs for '$($group.Name)'")
+            }
         }
     }
 
