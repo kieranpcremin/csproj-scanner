@@ -99,6 +99,9 @@ Scanning 12 project(s)...
   DPS.Model.csproj                  0         0       0
 
   Project issues: 3   Version conflicts: 1   Warnings: 1   Fixed: 0
+
+  # With -Fix applied, fixed items are removed from Issues/Warnings and counted only under Fixed:
+  Project issues: 0   Version conflicts: 1   Warnings: 0   Fixed: 4
 ```
 
 ---
@@ -148,6 +151,8 @@ Running with `-Fix` is safe. Before modifying any file:
 - ✅ Only clearly safe issues are auto-fixed
 
 Add `-NoBackup` to skip backup creation if you are confident in the changes or working in a version-controlled directory where files can be reverted via git.
+
+> **Counts:** Fixed items are removed from the Issues and Warnings counts and appear only under Fixed. So after a clean `-Fix` run, Issues and Warnings will reflect only what still needs manual attention.
 
 **What gets fixed automatically:**
 - Duplicate `PackageReference` elements → second and subsequent occurrences removed
