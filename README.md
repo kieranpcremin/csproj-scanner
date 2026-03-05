@@ -100,8 +100,8 @@ Scanning 12 project(s)...
 
   Project issues: 3   Version conflicts: 1   Warnings: 1   Fixed: 0
 
-  # With -Fix applied, fixed items are removed from Issues/Warnings and counted only under Fixed:
-  Project issues: 0   Version conflicts: 1   Warnings: 0   Fixed: 4
+  # With -Fix applied, Issues/Warnings show what was found, Fixed shows what was resolved:
+  Project issues: 3   Version conflicts: 1   Warnings: 1   Fixed: 4
 ```
 
 ---
@@ -152,7 +152,7 @@ Running with `-Fix` is safe. Before modifying any file:
 
 Add `-NoBackup` to skip backup creation if you are confident in the changes or working in a version-controlled directory where files can be reverted via git.
 
-> **Counts:** Fixed items are removed from the Issues and Warnings counts and appear only under Fixed. So after a clean `-Fix` run, Issues and Warnings will reflect only what still needs manual attention.
+> **Counts:** Issues and Warnings always show everything **found**. Fixed shows how many were **resolved automatically**. This means after a `-Fix` run, Issues=5 and Fixed=5 means 5 issues were found and all 5 were handled. Issues=5 and Fixed=3 means 2 still need manual attention.
 
 **What gets fixed automatically:**
 - Duplicate `PackageReference` elements → second and subsequent occurrences removed

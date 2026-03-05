@@ -140,12 +140,11 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
 
     foreach ($node in (Get-DuplicateNodes $pkgNodes { param($n) $n.GetAttribute("Include") })) {
         $name = $node.GetAttribute("Include")
+        $result.Issues.Add("[DUPLICATE PackageReference]  $name")
         if ($ApplyFix) {
             $node.ParentNode.RemoveChild($node) | Out-Null
             $result.Fixed.Add("Removed duplicate PackageReference: $name")
             $modified = $true
-        } else {
-            $result.Issues.Add("[DUPLICATE PackageReference]  $name")
         }
     }
 
@@ -163,12 +162,11 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
 
     foreach ($node in (Get-DuplicateNodes $projNodes { param($n) $n.GetAttribute("Include") -replace '\\', '/' })) {
         $name = $node.GetAttribute("Include")
+        $result.Issues.Add("[DUPLICATE ProjectReference]  $name")
         if ($ApplyFix) {
             $node.ParentNode.RemoveChild($node) | Out-Null
             $result.Fixed.Add("Removed duplicate ProjectReference: $name")
             $modified = $true
-        } else {
-            $result.Issues.Add("[DUPLICATE ProjectReference]  $name")
         }
     }
 
@@ -177,12 +175,11 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
 
     foreach ($node in (Get-DuplicateNodes $importNodes { param($n) $n.GetAttribute("Project") })) {
         $name = $node.GetAttribute("Project")
+        $result.Issues.Add("[DUPLICATE Import]  $name")
         if ($ApplyFix) {
             $node.ParentNode.RemoveChild($node) | Out-Null
             $result.Fixed.Add("Removed duplicate Import: $name")
             $modified = $true
-        } else {
-            $result.Issues.Add("[DUPLICATE Import]  $name")
         }
     }
 
@@ -191,12 +188,11 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
 
     foreach ($node in (Get-DuplicateNodes $refNodes { param($n) ($n.GetAttribute("Include") -split ',')[0].Trim() })) {
         $name = ($node.GetAttribute("Include") -split ',')[0].Trim()
+        $result.Issues.Add("[DUPLICATE Reference]  $name")
         if ($ApplyFix) {
             $node.ParentNode.RemoveChild($node) | Out-Null
             $result.Fixed.Add("Removed duplicate Reference: $name")
             $modified = $true
-        } else {
-            $result.Issues.Add("[DUPLICATE Reference]  $name")
         }
     }
 
@@ -207,12 +203,11 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
     foreach ($target in $ensureTargets) {
         $errorNodes = @($target.SelectNodes(".//*") | Where-Object { $_.LocalName -eq "Error" })
         if ($errorNodes.Count -gt 0) {
+            $result.Issues.Add("[ACTIVE EnsureNuGetPackageBuildImports]  $($errorNodes.Count) Error element(s) - will fail on clean build agents")
             if ($ApplyFix) {
                 while ($target.HasChildNodes) { $target.RemoveChild($target.FirstChild) | Out-Null }
                 $result.Fixed.Add("Emptied EnsureNuGetPackageBuildImports target")
                 $modified = $true
-            } else {
-                $result.Issues.Add("[ACTIVE EnsureNuGetPackageBuildImports]  $($errorNodes.Count) Error element(s) - will fail on clean build agents")
             }
         }
     }
@@ -230,6 +225,7 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
     }
     if ($localeSatellites) {
         foreach ($group in ($localeSatellites | Group-Object Base | Where-Object { $_.Count -ge 3 })) {
+            $result.Warnings.Add("[LOCALE BLOAT]  $($group.Count) locale satellite packs for '$($group.Name)' - remove unless non-English output is required")
             if ($ApplyFix) {
                 $packagesToRemove = $group.Group.Package
                 foreach ($node in $pkgNodes) {
@@ -239,8 +235,6 @@ function Invoke-ScanProject ([System.IO.FileInfo]$File, [bool]$ApplyFix, [bool]$
                     }
                 }
                 $result.Fixed.Add("Removed $($group.Count) locale satellite packs for '$($group.Name)'")
-            } else {
-                $result.Warnings.Add("[LOCALE BLOAT]  $($group.Count) locale satellite packs for '$($group.Name)' - remove unless non-English output is required")
             }
         }
     }
